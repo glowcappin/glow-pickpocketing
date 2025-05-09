@@ -34,6 +34,8 @@ Config.Loot = {
     { item = 'goldcoins', amount = {min = 8, max = 15}, weight = 5 },
 }
 
+Config.FatPedDistinction = true -- If true, the script will be able to distinguish between a "fat" and "skinny" ped. "Fat" peds will have a different loot table.
+
 Config.FatPedLoot = {
     { item = 'burger', amount = {min = 1, max = 2}, weight = 30 },
     { item = 'orangotang_icecream', amount = {min = 1, max = 1}, weight = 15 },

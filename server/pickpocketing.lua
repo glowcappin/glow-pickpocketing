@@ -46,7 +46,7 @@ function GetRandomLoot(isFatPed)
     local totalWeight = 0
     local lootTable = Config.Loot
     
-    if isFatPed then
+    if isFatPed and Config.FatPedDistinction then
         lootTable = Config.FatPedLoot
     end
     
