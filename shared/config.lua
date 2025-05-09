@@ -12,8 +12,8 @@ Config.StressAmountFail = 10
 Config.ChanceToGetCaught = 50 -- For now, this will alert police and the ped will flee. However, in the next update, the ped will be able to attack the player.
 
 Config.Cooldown = {
-    Min = 180,
-    Max = 480,
+    Min = 180, -- in seconds (Inital: 3 minutes, 180s)
+    Max = 480, -- in seconds (Inital: 8 minutes, 480s)
 }
 
 Config.ProgressBar = {

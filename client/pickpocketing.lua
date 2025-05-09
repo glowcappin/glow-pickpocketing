@@ -120,12 +120,12 @@ AddEventHandler("Pickpocket:Client:DoPickpocket", function(data)
         end
     end
     
-	RequestAnimDict('friends@frl@ig_1')
-	while not HasAnimDictLoaded('friends@frl@ig_1') do
+	RequestAnimDict(Config.ProgressBar.AnimDict)
+	while not HasAnimDictLoaded(Config.ProgressBar.AnimDict) do
 		Wait(5)
 	end
 
-    TaskPlayAnim(PlayerPedId(), 'friends@frl@ig_1', 'idle_b_lamar', 1.0, 1.0, -1, 1, 1, 0, 0, 0)
+    TaskPlayAnim(PlayerPedId(), Config.ProgressBar.AnimDict, Config.ProgressBar.Anim, 1, 1, 0, 0, 0)
     
     Progress:Progress({
         name = "prepare_pickpocket",
