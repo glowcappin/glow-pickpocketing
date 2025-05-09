@@ -1,7 +1,7 @@
 -- VARIABLES
 local pickpocketCooldown = 0
 local processedPeds = {}
-local PLAYER_PED = nil -- Will store the player's ped ID
+local PLAYER_PED = nil 
 
 -- BRIDGING
 if GetResourceState(Config.FrameworkName .. "-base") ~= "started" then
@@ -16,30 +16,12 @@ else
         Animations = exports[Config.FrameworkName .. "-base"]:FetchComponent("Animations")
         Logger = exports[Config.FrameworkName .. "-base"]:FetchComponent("Logger")
         Callbacks = exports[Config.FrameworkName .. "-base"]:FetchComponent("Callbacks")
-        PedInteraction = exports[Config.FrameworkName .. "-base"]:FetchComponent("PedInteraction")
         Progress = exports[Config.FrameworkName .. "-base"]:FetchComponent("Progress")
-        Phone = exports[Config.FrameworkName .. "-base"]:FetchComponent("Phone")
         Notification = exports[Config.FrameworkName .. "-base"]:FetchComponent("Notification")
-        Polyzone = exports[Config.FrameworkName .. "-base"]:FetchComponent("Polyzone")
+        Status = exports[Config.FrameworkName .. "-base"]:FetchComponent("Status")
         Targeting = exports[Config.FrameworkName .. "-base"]:FetchComponent("Targeting")
-        Progress = exports[Config.FrameworkName .. "-base"]:FetchComponent("Progress")
         Minigame = exports[Config.FrameworkName .. "-base"]:FetchComponent("Minigame")
-        Keybinds = exports[Config.FrameworkName .. "-base"]:FetchComponent("Keybinds")
-        Properties = exports[Config.FrameworkName .. "-base"]:FetchComponent("Properties")
-        Sounds = exports[Config.FrameworkName .. "-base"]:FetchComponent("Sounds")
-        Interaction = exports[Config.FrameworkName .. "-base"]:FetchComponent("Interaction")
         Inventory = exports[Config.FrameworkName .. "-base"]:FetchComponent("Inventory")
-        Action = exports[Config.FrameworkName .. "-base"]:FetchComponent("Action")
-        Blips = exports[Config.FrameworkName .. "-base"]:FetchComponent("Blips")
-        EmergencyAlerts = exports[Config.FrameworkName .. "-base"]:FetchComponent("EmergencyAlerts")
-        Doors = exports[Config.FrameworkName .. "-base"]:FetchComponent("Doors")
-        ListMenu = exports[Config.FrameworkName .. "-base"]:FetchComponent("ListMenu")
-        Input = exports[Config.FrameworkName .. "-base"]:FetchComponent("Input")
-        Game = exports[Config.FrameworkName .. "-base"]:FetchComponent("Game")
-        NetSync = exports[Config.FrameworkName .. "-base"]:FetchComponent("NetSync")
-        Damage = exports[Config.FrameworkName .. "-base"]:FetchComponent("Damage")
-        Lasers = exports[Config.FrameworkName .. "-base"]:FetchComponent("Lasers")
-        UISounds = exports[Config.FrameworkName .. "-base"]:FetchComponent("UISounds")
     end
 
     AddEventHandler(
@@ -53,15 +35,10 @@ else
                     "Callbacks",
                     "Progress",
                     "Notification",
+                    "Status",
                     "Targeting",
-                    "Progress",
                     "Minigame",
                     "Inventory",
-                    "Action",
-                    "Blips",
-                    "EmergencyAlerts",
-                    "Game",
-                    "NetSync"
                 },
                 function(error)
                     if #error > 0 then
@@ -80,15 +57,15 @@ else
                                     Targeting:AddPedModel(GetEntityModel(ped), "user", {
                                         {
                                             icon = "user",
-                                            text = Config.Pickpocketing.TargetLabel,
+                                            text = Config.TargetLabel,
                                             event = "Pickpocket:Client:DoPickpocket",
-                                            minDist = Config.Pickpocketing.TargetDistance,
+                                            minDist = Config.TargetDistance,
                                             data = { entity = ped },
                                             isEnabled = function(data, entity)
                                                 return GetCloudTimeAsInt() >= pickpocketCooldown and not IsInBlacklistedZone()
                                             end,
                                         },
-                                    }, Config.Pickpocketing.TargetDistance)
+                                    }, Config.TargetDistance)
                                 end
                             end
                             
@@ -113,7 +90,7 @@ AddEventHandler("Pickpocket:Client:DoPickpocket", function(data)
     local currentTime = GetCloudTimeAsInt()
     
     if currentTime < pickpocketCooldown then
-        Notification:Error(Config.Pickpocketing.CooldownText)
+        Notification:Error(Config.CooldownText)
         return
     end
     
@@ -134,7 +111,7 @@ AddEventHandler("Pickpocket:Client:DoPickpocket", function(data)
         FreezeEntityPosition(ped, true)
         
         local pedModel = GetEntityModel(ped)
-        for _, fatPedModel in ipairs(Config.Pickpocketing.FatPeds) do
+        for _, fatPedModel in ipairs(Config.FatPeds) do
             local fatPedHash = GetHashKey(fatPedModel)
             if pedModel == fatPedHash then
                 isFatPed = true
@@ -143,49 +120,29 @@ AddEventHandler("Pickpocket:Client:DoPickpocket", function(data)
         end
     end
     
-    local dumbAnim = true
-
 	RequestAnimDict('friends@frl@ig_1')
 	while not HasAnimDictLoaded('friends@frl@ig_1') do
 		Wait(5)
 	end
 
-	CreateThread(function()
-		while dumbAnim do
-			TaskPlayAnim(
-				PlayerPedId(),
-				'friends@frl@ig_1',
-				'idle_b_lamar',
-				1.0,
-				1.0,
-				1.0,
-				16,
-				0.0,
-				0,
-				0,
-				0
-			)
-			Wait(1000)
-		end
-	end)
+    TaskPlayAnim(PlayerPedId(), 'friends@frl@ig_1', 'idle_b_lamar', 1.0, 1.0, -1, 1, 1, 0, 0, 0)
     
     Progress:Progress({
         name = "prepare_pickpocket",
-        duration = Config.Pickpocketing.ProgressBar.Duration,
-        label = Config.Pickpocketing.ProgressBar.Label,
+        duration = Config.ProgressBar.Duration,
+        label = Config.ProgressBar.Label,
         useWhileDead = false,
-        canCancel = true,
+        canCancel = false,
         ignoreModifier = true,
         controlDisables = {
-            disableMovement = Config.Pickpocketing.Controls.DisableMovement,
-            disableCarMovement = Config.Pickpocketing.Controls.DisableCarMovement,
-            disableMouse = Config.Pickpocketing.Controls.DisableMouse,
-            disableCombat = Config.Pickpocketing.Controls.DisableCombat,
+            disableMovement = true,
+            disableCarMovement = true,
+            disableMouse = false,
+            disableCombat = true,
         },
         animation = false
     }, function(status)
         if not status then
-            dumbAnim = false
             ClearPedTasks(PLAYER_PED)
 
             Minigame.Play:RoundSkillbar(1.0, 5, {
@@ -204,38 +161,14 @@ AddEventHandler("Pickpocket:Client:DoPickpocket", function(data)
             })
 
             ClearPedTasks(PLAYER_PED)
-        else
-            if DoesEntityExist(ped) then
-                ClearPedTasksImmediately(ped)
-                FreezeEntityPosition(ped, false)
-                TaskWanderStandard(ped, 10.0, 10)
-            end
-            dumbAnim = false
         end
     end)
 end)
 
 AddEventHandler("Pickpocket:Client:Result", function(success, ped, isFatPed)
-    if DoesEntityExist(ped) then
-        ClearPedTasksImmediately(ped)
-        FreezeEntityPosition(ped, false)
-        
-        if success and math.random(1, 100) <= Config.Pickpocketing.ChanceToGetCaught then
-            TaskCombatPed(ped, PlayerPedId(), 0, 16)
-        elseif success then
-            TaskWanderStandard(ped, 10.0, 10)
-        end 
-
-        if not success then
-            TaskCombatPed(ped, PlayerPedId(), 0, 16)
-        end
-    end
-    
     if success then
-        local cooldownTime = math.random(Config.Pickpocketing.Cooldown.Min, Config.Pickpocketing.Cooldown.Max)
+        local cooldownTime = math.random(Config.Cooldown.Min, Config.Cooldown.Max)
         pickpocketCooldown = GetCloudTimeAsInt() + cooldownTime
-        
-        Notification:Success("Checking pockets...")
         
         Callbacks:ServerCallback("Pickpocket:Server:Success", {
             isFatPed = isFatPed
@@ -244,18 +177,40 @@ AddEventHandler("Pickpocket:Client:Result", function(success, ped, isFatPed)
                 Notification:Error("Your pockets are too full to hold anything else!")
             end
         end)
+
+        Status.Modify:Add("PLAYER_STRESS", Config.StressAmountSuccess, false, true)
     else
-        Notification:Error(Config.Pickpocketing.FailedText)
+        Notification:Error(Config.FailedText)
         
-        if math.random(1, 100) <= Config.Pickpocketing.ChanceToGetCaught then
-            Notification:Error(Config.Pickpocketing.CaughtText)
-            
-            TriggerServerEvent("Pickpocket:Server:Caught")
-        end
-        
-        local cooldownTime = math.random(Config.Pickpocketing.Cooldown.Min, Config.Pickpocketing.Cooldown.Max)
+        local cooldownTime = math.random(Config.Cooldown.Min, Config.Cooldown.Max)
         pickpocketCooldown = GetCloudTimeAsInt() + cooldownTime
+
+        Status.Modify:Add("PLAYER_STRESS", Config.StressAmountFail, false, true)
     end
+
+    FreezeEntityPosition(ped, false)
+
+    local chance = math.random(1, 100)
+    if chance <= Config.ChanceToGetCaught then
+        -- if math.random(1, 2) == 1 then
+        --     local relationshipGroup = GetHashKey("HATES_PLAYER")
+        --     SetPedRelationshipGroupHash(ped, relationshipGroup)
+            
+        --     SetRelationshipBetweenGroups(5, relationshipGroup, GetHashKey("PLAYER"))
+            
+        --     TaskCombatPed(ped, PlayerPedId(), 0, 16)
+        --     TriggerServerEvent("Pickpocket:Server:Caught")
+        -- else
+
+        --     Notification:Error("2")
+        -- end
+        SetPedFleeAttributes(ped, 0, 0)
+        TaskSmartFleePed(ped, PlayerPedId(), 100.0, -1, true, true)
+        Notification:Error(Config.CaughtText)
+    elseif success then
+        TaskWanderStandard(ped, 10.0, 10)
+    end
+    
 end)
 -- END MAIN EVENTS
 
@@ -279,12 +234,12 @@ end)
 function ForceStopAllAnimations()
     ClearPedTasks(PLAYER_PED)
     ClearPedSecondaryTask(PLAYER_PED)
-    StopAnimTask(PLAYER_PED, Config.Pickpocketing.ProgressBar.AnimDict, Config.Pickpocketing.ProgressBar.Anim, 1.0)
+    StopAnimTask(PLAYER_PED, Config.ProgressBar.AnimDict, Config.ProgressBar.Anim, 1.0)
 end
 
 function IsPedBlacklisted(ped)
     local pedModel = GetEntityModel(ped)
-    for _, blacklistedModel in ipairs(Config.Pickpocketing.BlacklistedPeds) do
+    for _, blacklistedModel in ipairs(Config.BlacklistedPeds) do
         if GetHashKey(blacklistedModel) == pedModel then
             return true
         end
@@ -294,7 +249,7 @@ end
 
 function IsInBlacklistedZone()
     local playerCoords = GetEntityCoords(PlayerPedId())
-    for _, zone in ipairs(Config.Pickpocketing.BlacklistedZones) do
+    for _, zone in ipairs(Config.BlacklistedZones) do
         local distance = #(vector3(playerCoords.x, playerCoords.y, playerCoords.z) - vector3(zone.x, zone.y, zone.z))
         if distance <= zone.radius then
             return true

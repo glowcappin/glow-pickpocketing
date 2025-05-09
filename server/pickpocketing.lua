@@ -8,64 +8,22 @@ else
 
     AddEventHandler("Pickpocketing:Shared:DependencyUpdate", RetrieveComponents)
     function RetrieveComponents()
-	    Banking = exports[Config.FrameworkName .. "-base"]:FetchComponent("Banking")
 	    Fetch = exports[Config.FrameworkName .. "-base"]:FetchComponent("Fetch")
 	    Logger = exports[Config.FrameworkName .. "-base"]:FetchComponent("Logger")
-	    Utils = exports[Config.FrameworkName .. "-base"]:FetchComponent("Utils")
 	    Callbacks = exports[Config.FrameworkName .. "-base"]:FetchComponent("Callbacks")
-	    Middleware = exports[Config.FrameworkName .. "-base"]:FetchComponent("Middleware")
 	    Inventory = exports[Config.FrameworkName .. "-base"]:FetchComponent("Inventory")
-	    Loot = exports[Config.FrameworkName .. "-base"]:FetchComponent("Loot")
-	    Wallet = exports[Config.FrameworkName .. "-base"]:FetchComponent("Wallet")
-	    Execute = exports[Config.FrameworkName .. "-base"]:FetchComponent("Execute")
-	    Chat = exports[Config.FrameworkName .. "-base"]:FetchComponent("Chat")
-	    Sounds = exports[Config.FrameworkName .. "-base"]:FetchComponent("Sounds")
-	    Tasks = exports[Config.FrameworkName .. "-base"]:FetchComponent("Tasks")
 	    EmergencyAlerts = exports[Config.FrameworkName .. "-base"]:FetchComponent("EmergencyAlerts")
-	    Properties = exports[Config.FrameworkName .. "-base"]:FetchComponent("Properties")
-	    Routing = exports[Config.FrameworkName .. "-base"]:FetchComponent("Routing")
 	    Status = exports[Config.FrameworkName .. "-base"]:FetchComponent("Status")
-	    WaitList = exports[Config.FrameworkName .. "-base"]:FetchComponent("WaitList")
-	    Reputation = exports[Config.FrameworkName .. "-base"]:FetchComponent("Reputation")
-	    Jobs = exports[Config.FrameworkName .. "-base"]:FetchComponent("Jobs")
-	    Doors = exports[Config.FrameworkName .. "-base"]:FetchComponent("Doors")
-	    Crypto = exports[Config.FrameworkName .. "-base"]:FetchComponent("Crypto")
-	    Phone = exports[Config.FrameworkName .. "-base"]:FetchComponent("Phone")
-	    Vehicles = exports[Config.FrameworkName .. "-base"]:FetchComponent("Vehicles")
-	    Vendor = exports[Config.FrameworkName .. "-base"]:FetchComponent("Vendor")
-	    CCTV = exports[Config.FrameworkName .. "-base"]:FetchComponent("CCTV")
-	    Sync = exports[Config.FrameworkName .. "-base"]:FetchComponent("Sync")
     end
 
     AddEventHandler("Core:Shared:Ready", function()
         exports[Config.FrameworkName .. "-base"]:RequestDependencies("Pickpocketing", {
-            "Banking",
             "Fetch",
             "Logger",
-            "Utils",
             "Callbacks",
-            "Middleware",
             "Inventory",
-            "Loot",
-            "Wallet",
-            "Execute",
-            "Chat",
-            "Sounds",
-            "Tasks",
             "EmergencyAlerts",
-            "Properties",
-            "Routing",
             "Status",
-            "WaitList",
-            "Reputation",
-            "Jobs",
-            "Doors",
-            "Crypto",
-            "Phone",
-            "Vehicles",
-            "Vendor",
-            "CCTV",
-            "Sync",
         }, function(error)
             if #error > 0 then
                 return
@@ -86,10 +44,10 @@ else
 -- HELPER FUNCTIONS
 function GetRandomLoot(isFatPed)
     local totalWeight = 0
-    local lootTable = Config.Pickpocketing.Loot
+    local lootTable = Config.Loot
     
     if isFatPed then
-        lootTable = Config.Pickpocketing.FatPedLoot
+        lootTable = Config.FatPedLoot
     end
     
     for _, item in ipairs(lootTable) do
@@ -121,34 +79,22 @@ function HandlePickpocketSuccess(source, data, cb)
 
     local char
 
-    if Config.BaseName == "mythic" then
+    if Config.Base == "mythic" then
         char = Fetch:Source(source):GetData("Character")
-    elseif Config.BaseName == "sandbox" then
+    elseif Config.Base == "sandbox" then
         char = Fetch:CharacterSource(source)
     end
     
     local loot = GetRandomLoot(data.isFatPed)
-    
-    if Config.Debugging then
-        print("^3[Pickpocketing DEBUG]^7 Generated loot:", loot.item, "x", loot.amount)
-    end
 
     local success = Inventory:AddItem(char:GetData("SID"), loot.item, loot.amount, {}, 1, false, false, false, false, false, false)
-    
-    if Config.Debugging then
-        print("^3[Pickpocketing DEBUG]^7 AddItem result:", success)
-    end
-
 end
 -- END HELPER FUNCTIONS
 
 RegisterNetEvent("Pickpocket:Server:Caught")
 AddEventHandler("Pickpocket:Server:Caught", function()
     local source = source
-    PDAlert(source, Config.Pickpocketing.AlertTitle, Config.Pickpocketing.AlertContent, Config.Pickpocketing.AlertID)
-    if Config.ServerLogging then
-        print(string.format("[Pickpocketing] Player %s was caught pickpocketing", source))
-    end
+    PDAlert(source, Config.AlertTitle, Config.AlertContent, Config.AlertID)
 end) 
 
 function PDAlert(src, content, content2, name)

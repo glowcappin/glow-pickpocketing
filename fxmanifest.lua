@@ -1,10 +1,12 @@
 fx_version 'cerulean'
 game 'gta5'
 
-name 'Pickpocketing-Script'
-description 'A configurable pickpocketing script for FiveM'
-author 'Generated'
+name 'Glow Pickpocketing'
+description 'A configurable pickpocketing script for Mythic and Sandbox Framework'
+author 'glowcappin'
 version '1.0.0'
+
+lua54 'yes'
 
 shared_scripts {
     'shared/config.lua'
@@ -16,4 +18,8 @@ client_scripts {
 
 server_scripts {
     'server/pickpocketing.lua'
+}
+
+escrow_ignore {
+    'shared/config.lua'
 }
